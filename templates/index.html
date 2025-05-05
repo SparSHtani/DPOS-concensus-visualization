@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>DPoS Simulation</title>
+    <style>
+        body { font-family: Arial; text-align: center; padding: 20px; }
+        .node { display: inline-block; margin: 20px; padding: 20px; border: 1px solid #ccc; border-radius: 10px; width: 200px; }
+        .proposer { background-color: #d1ffd1; }
+        .result { font-size: 1.2em; margin-top: 30px; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h1>Delegated Proof of Stake (DPoS) Simulation</h1>
+    <form method="post" action="/submit_stake">
+        {% for node in nodes %}
+            <div class="node {% if proposed_node and proposed_node.id == node.id %}proposer{% endif %}">
+                <h3>Node {{ node.id }}</h3>
+                <label>Stake:</label><br>
+                <input type="number" name="stake{{ node.id }}" value="{{ node.stake }}"><br><br>
+                {% if node.is_delegate %}
+                    <strong>Delegate</strong><br>
+                {% endif %}
+                <p>{{ node.message }}</p>
+            </div>
+        {% endfor %}
+        <br><br>
+        <input type="submit" value="Start Consensus">
+    </form>
+
+    {% if proposed_node %}
+    <form method="post" action="/vote">
+        <h2>Validate Proposed Block from Node {{ proposed_node.id }}</h2>
+        {% for node in nodes %}
+            <div class="node">
+                <h3>Node {{ node.id }}</h3>
+                <label>Vote:</label><br>
+                <select name="vote{{ node.id }}">
+                    <option value="Yes" {% if node.vote == "Yes" %}selected{% endif %}>Yes</option>
+                    <option value="No" {% if node.vote == "No" %}selected{% endif %}>No</option>
+                </select>
+                <p>Current vote: {{ node.vote }}</p>
+            </div>
+        {% endfor %}
+        <br>
+        <input type="submit" value="Submit Votes">
+    </form>
+    {% endif %}
+
+    {% if vote_result %}
+        <div class="result">{{ vote_result }}</div>
+    {% endif %}
+</body>
+</html>
