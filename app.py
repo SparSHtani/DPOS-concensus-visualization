@@ -58,16 +58,19 @@ def vote():
     no_votes = 0
 
     for node in nodes:
-        node['vote'] = request.form.get(f'vote{node["id"]}')
-        if node['vote'] == "Yes":
-            yes_votes += 1
-        elif node['vote'] == "No":
-            no_votes += 1
+        if node['is_delegate']:
+            node['vote'] = request.form.get(f'vote{node["id"]}')
+            if node['vote'] == "Yes":
+                yes_votes += 1
+            elif node['vote'] == "No":
+                no_votes += 1
+        else:
+            node['vote'] = ""  # Clear any accidental input from non-delegates
 
     if yes_votes > no_votes:
-        vote_result = f"✅ Block accepted by majority vote ({yes_votes} Yes / {no_votes} No)."
+        vote_result = f"✅ Block accepted by majority vote of delegates ({yes_votes} Yes / {no_votes} No)."
     else:
-        vote_result = f"❌ Block rejected by majority vote ({yes_votes} Yes / {no_votes} No)."
+        vote_result = f"❌ Block rejected by majority vote of delegates ({yes_votes} Yes / {no_votes} No)."
 
     return render_template('index.html', nodes=nodes, proposed_node=proposed_node, vote_result=vote_result)
 
